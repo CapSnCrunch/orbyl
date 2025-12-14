@@ -1,0 +1,183 @@
+.exhibit-layout {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.exhibit-content {
+  width: 100%;
+  min-height: 100vh;
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.exhibit-content.fade-out {
+  opacity: 0;
+}
+
+.exhibit-content.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.home-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+  opacity: 1;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.home-button:hover {
+  opacity: 0.6 !important;
+}
+
+.home-button.fade-out {
+  opacity: 0;
+}
+
+.home-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #4b5563;
+}
+
+.toc-button {
+  position: absolute;
+  top: 2rem;
+  left: 5.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+  opacity: 1;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.toc-button:hover {
+  opacity: 0.6 !important;
+}
+
+.toc-button.fade-out {
+  opacity: 0;
+}
+
+.toc-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #4b5563;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: opacity 0.4s ease;
+  z-index: 10;
+  opacity: 1;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.nav-button:hover {
+  opacity: 0.6 !important;
+}
+
+.nav-button.fade-out {
+  opacity: 0;
+}
+
+.nav-button-left {
+  left: 2rem;
+}
+
+.nav-button-right {
+  right: 2rem;
+}
+
+.nav-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #4b5563;
+}
+
+.nav-chevron {
+  opacity: 0.7;
+}
+
+.nav-exhibit-icon {
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-button-left .nav-exhibit-icon {
+  transform: translateX(-10px);
+}
+
+.nav-button-right .nav-exhibit-icon {
+  transform: translateX(10px);
+}
+
+.nav-button:hover .nav-exhibit-icon {
+  opacity: 0.9;
+  transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+  .home-button {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .toc-button {
+    top: 1rem;
+    left: 4rem;
+  }
+
+  .nav-button {
+    gap: 0.25rem;
+  }
+
+  .nav-button-left {
+    left: 1rem;
+  }
+
+  .nav-button-right {
+    right: 1rem;
+  }
+
+  .nav-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+

@@ -1,0 +1,132 @@
+.dotted-sphere-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  position: relative;
+  gap: 3rem;
+}
+
+.sphere-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -4rem;
+}
+
+.controls-container {
+  position: absolute;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.timer-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.toggle-button {
+  position: relative;
+  width: 3.5rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background-color: #d1d5db;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.toggle-button.active {
+  background-color: #3b82f6;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.toggle-slider.active {
+  transform: translateX(1.5rem);
+}
+
+.timer-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #4b5563;
+  transition: color 0.3s;
+}
+
+.timer-icon.active {
+  color: #3b82f6;
+}
+
+.density-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.density-slider {
+  width: 12rem;
+  height: 0.5rem;
+  border-radius: 0.5rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.density-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: white;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.density-slider::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: white;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .dotted-sphere-page {
+    gap: 2rem;
+  }
+  
+  .sphere-container {
+    margin-top: -3rem;
+  }
+  
+  .controls-container {
+    bottom: 2rem;
+  }
+  
+  .density-slider {
+    width: 8rem;
+  }
+}
+

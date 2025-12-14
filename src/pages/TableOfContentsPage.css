@@ -1,0 +1,85 @@
+.table-of-contents {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.exhibit-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 120px);
+  gap: 24px;
+  max-width: 100%;
+}
+
+.exhibit-card {
+  width: 120px;
+  height: 120px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.exhibit-card:not(.placeholder):hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  border-color: #3498db;
+}
+
+.exhibit-card:not(.placeholder):active {
+  transform: scale(0.98);
+}
+
+.exhibit-card.placeholder {
+  background: #f8f9fa;
+  border-style: dashed;
+  border-color: #d0d0d0;
+  cursor: default;
+  box-shadow: none;
+}
+
+.exhibit-icon {
+  color: #2c3e50;
+  transition: all 0.25s ease;
+}
+
+.exhibit-card:not(.placeholder):hover .exhibit-icon {
+  color: #3498db;
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .exhibit-grid {
+    grid-template-columns: repeat(3, 100px);
+    gap: 16px;
+  }
+
+  .exhibit-card {
+    width: 100px;
+    height: 100px;
+  }
+
+  .exhibit-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .exhibit-grid {
+    grid-template-columns: repeat(2, 90px);
+    gap: 12px;
+  }
+
+  .exhibit-card {
+    width: 90px;
+    height: 90px;
+  }
+}
