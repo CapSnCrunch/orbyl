@@ -390,8 +390,9 @@ const HoppingDots = ({ frogCount }: HoppingDotsProps) => {
       ref={containerRef}
       style={{
         position: 'relative',
-        width: '300px',
-        height: '300px',
+        width: '100%',
+        height: '100%',
+        aspectRatio: '1 / 1',
         border: '2px solid rgba(100, 100, 100, 0.2)',
         borderRadius: '50%'
       }}
@@ -447,12 +448,12 @@ const HoppingDots = ({ frogCount }: HoppingDotsProps) => {
           key={dot.id}
           style={{
             position: 'absolute',
-            width: '12px',
-            height: '12px',
+            width: '4%',
+            height: '4%',
             background: '#333',
             borderRadius: '50%',
-            left: `${dot.x}px`,
-            top: `${dot.y}px`,
+            left: `${(dot.x / 300) * 100}%`,
+            top: `${(dot.y / 300) * 100}%`,
             transform: `translate(-50%, -50%) scale(${dot.scale})`,
             opacity: dot.opacity,
             transition: dot.isRemoving ? 'all 0.2s ease-out' : 'none',

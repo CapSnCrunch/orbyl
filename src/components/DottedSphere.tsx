@@ -52,6 +52,12 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
   const [cursorPos, setCursorPos] = useState<CursorPosition | null>(null);
   const [repulsionStrength, setRepulsionStrength] = useState(1);
   const [animatingPoints, setAnimatingPoints] = useState<AnimatingPoint[]>([]);
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
+  const [isHoveringCircle, setIsHoveringCircle] = useState(false);
+  
+  // Track recent mouse positions for velocity calculation
+  const recentPositions = useRef<{ x: number; y: number; time: number }[]>([]);
+  const momentumFrameId = useRef<number | null>(null);
 
   // Generate points on a sphere using Fibonacci lattice
   const generateSpherePoints = (numPoints: number): Point3D[] => {
@@ -106,6 +112,43 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     
     setPoints(newPoints);
   }, [numPoints]);
+
+  // Handle momentum physics
+  useEffect(() => {
+    if (!isDragging && (Math.abs(velocity.x) > 0.0001 || Math.abs(velocity.y) > 0.0001)) {
+      const friction = 0.95; // Deceleration factor
+      
+      const animate = () => {
+        setVelocity(prev => {
+          const newVelX = prev.x * friction;
+          const newVelY = prev.y * friction;
+          
+          // Apply velocity to rotation
+          setRotation(rot => ({
+            x: rot.x + newVelX,
+            y: rot.y + newVelY
+          }));
+          
+          // Stop if velocity is negligible
+          if (Math.abs(newVelX) < 0.0001 && Math.abs(newVelY) < 0.0001) {
+            return { x: 0, y: 0 };
+          }
+          
+          return { x: newVelX, y: newVelY };
+        });
+        
+        momentumFrameId.current = requestAnimationFrame(animate);
+      };
+      
+      momentumFrameId.current = requestAnimationFrame(animate);
+    }
+    
+    return () => {
+      if (momentumFrameId.current) {
+        cancelAnimationFrame(momentumFrameId.current);
+      }
+    };
+  }, [isDragging, velocity.x !== 0 || velocity.y !== 0]);
 
   // Handle repulsion strength decay
   useEffect(() => {
@@ -369,8 +412,11 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     if (!canvas) return { x: 0, y: 0, z: 0 };
     
     const rect = canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    // Scale to match canvas internal coordinates
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const sphereRadius = 180;
@@ -413,6 +459,10 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isInsideCircle(e.clientX, e.clientY)) return;
     
+    // Stop any ongoing momentum
+    setVelocity({ x: 0, y: 0 });
+    recentPositions.current = [{ x: e.clientX, y: e.clientY, time: performance.now() }];
+    
     setIsDragging(true);
     setLastPos({ x: e.clientX, y: e.clientY });
   };
@@ -422,6 +472,13 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     
     const deltaX = e.clientX - lastPos.x;
     const deltaY = e.clientY - lastPos.y;
+    const now = performance.now();
+    
+    // Track recent positions for velocity calculation (keep last 5)
+    recentPositions.current.push({ x: e.clientX, y: e.clientY, time: now });
+    if (recentPositions.current.length > 5) {
+      recentPositions.current.shift();
+    }
     
     setRotation(prev => ({
       x: prev.x - deltaY * 0.01,
@@ -432,7 +489,27 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
-    if (isDragging && isInsideCircle(e.clientX, e.clientY)) {
+    // Calculate velocity from recent positions
+    let velX = 0;
+    let velY = 0;
+    const positions = recentPositions.current;
+    
+    if (positions.length >= 2) {
+      const recent = positions[positions.length - 1];
+      const older = positions[0];
+      const timeDelta = recent.time - older.time;
+      
+      if (timeDelta > 0) {
+        // Convert pixel velocity to rotation velocity
+        velX = -((recent.y - older.y) / timeDelta) * 0.15;
+        velY = -((recent.x - older.x) / timeDelta) * 0.15;
+      }
+    }
+    
+    const speed = Math.sqrt(velX * velX + velY * velY);
+    
+    // Only trigger wave animation if the user wasn't flinging (low velocity)
+    if (isDragging && isInsideCircle(e.clientX, e.clientY) && speed < 0.01) {
       const spherePoint = get3DPointFromClick(e.clientX, e.clientY);
       
       if (timerMode) {
@@ -454,11 +531,25 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
       }
     }
     
+    // Apply momentum if velocity is significant
+    if (speed > 0.001) {
+      setVelocity({ x: velX, y: velY });
+    }
+    
     setIsDragging(false);
+    recentPositions.current = [];
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isInsideCircle(e.touches[0].clientX, e.touches[0].clientY)) return;
+    
+    // Stop any ongoing momentum
+    setVelocity({ x: 0, y: 0 });
+    recentPositions.current = [{ 
+      x: e.touches[0].clientX, 
+      y: e.touches[0].clientY, 
+      time: performance.now() 
+    }];
     
     setIsDragging(true);
     setLastPos({ 
@@ -472,6 +563,17 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     
     const deltaX = e.touches[0].clientX - lastPos.x;
     const deltaY = e.touches[0].clientY - lastPos.y;
+    const now = performance.now();
+    
+    // Track recent positions for velocity calculation
+    recentPositions.current.push({ 
+      x: e.touches[0].clientX, 
+      y: e.touches[0].clientY, 
+      time: now 
+    });
+    if (recentPositions.current.length > 5) {
+      recentPositions.current.shift();
+    }
     
     setRotation(prev => ({
       x: prev.x - deltaY * 0.01,
@@ -485,8 +587,26 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    // Calculate velocity from recent positions
+    let velX = 0;
+    let velY = 0;
+    const positions = recentPositions.current;
+    
+    if (positions.length >= 2) {
+      const recent = positions[positions.length - 1];
+      const older = positions[0];
+      const timeDelta = recent.time - older.time;
+      
+      if (timeDelta > 0) {
+        velX = -((recent.y - older.y) / timeDelta) * 0.15;
+        velY = -((recent.x - older.x) / timeDelta) * 0.15;
+      }
+    }
+    
+    const speed = Math.sqrt(velX * velX + velY * velY);
+    
     if (isDragging && e.changedTouches.length > 0) {
-      if (isInsideCircle(e.changedTouches[0].clientX, e.changedTouches[0].clientY)) {
+      if (isInsideCircle(e.changedTouches[0].clientX, e.changedTouches[0].clientY) && speed < 0.01) {
         const spherePoint = get3DPointFromClick(
           e.changedTouches[0].clientX, 
           e.changedTouches[0].clientY
@@ -510,7 +630,13 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
       }
     }
     
+    // Apply momentum if velocity is significant
+    if (speed > 0.001) {
+      setVelocity({ x: velX, y: velY });
+    }
+    
     setIsDragging(false);
+    recentPositions.current = [];
   };
 
   return (
@@ -527,8 +653,11 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
         if (!canvas) return;
         
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // Scale cursor position to match canvas internal coordinates
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
         setCursorPos({ x, y });
       }}
       onMouseUp={handleMouseUp}

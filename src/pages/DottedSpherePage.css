@@ -1,38 +1,52 @@
 .dotted-sphere-page {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   position: relative;
-  gap: 3rem;
+  overflow: hidden;
 }
 
 .sphere-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -4rem;
+  /* Scale based on viewport, leaving room for controls */
+  width: min(80vh, 85vw);
+  height: min(80vh, 85vw);
+}
+
+.sphere-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .controls-container {
   position: absolute;
-  bottom: 4rem;
+  bottom: clamp(1.5rem, 4vh, 4rem);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  width: min(600px, 90vw);
+  padding-left: clamp(16px, 5vw, 64px);
+  padding-right: clamp(16px, 5vw, 64px);
 }
 
 .timer-toggle-wrapper {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  position: relative;
+  z-index: 10;
 }
 
 .toggle-button {
@@ -113,16 +127,13 @@
 }
 
 @media (max-width: 768px) {
-  .dotted-sphere-page {
-    gap: 2rem;
-  }
-  
   .sphere-container {
-    margin-top: -3rem;
+    width: min(65vh, 90vw);
+    height: min(65vh, 90vw);
   }
   
-  .controls-container {
-    bottom: 2rem;
+  .timer-toggle-wrapper {
+    top: 1rem;
   }
   
   .density-slider {

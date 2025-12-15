@@ -89,9 +89,7 @@ const DottedSpherePage = () => {
           display: 'flex', 
           alignItems: 'center', 
           gap: '1rem',
-          width: '600px',
-          paddingLeft: '64px',
-          paddingRight: '64px'
+          width: '100%'
         }}>
           <svg width="24" height="24" viewBox="0 0 24 24">
             <circle cx="12" cy="8" r="2" fill="#9CA3AF"/>

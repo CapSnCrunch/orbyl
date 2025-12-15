@@ -6,23 +6,37 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  overflow: hidden;
 }
 
 .hopping-dots-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 1;
-  width: 100%;
+  /* Scale based on viewport, leaving room for controls */
+  width: min(55vh, 70vw);
+  height: min(55vh, 70vw);
+}
+
+.hopping-dots-container > div {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .hopping-controls-container {
   position: absolute;
-  bottom: 40px;
+  bottom: clamp(1.5rem, 4vh, 40px);
   display: flex;
   align-items: center;
   gap: 1rem;
-  width: 600px;
-  padding-left: 64px;
-  padding-right: 64px;
+  width: min(600px, 90vw);
+  padding-left: clamp(16px, 5vw, 64px);
+  padding-right: clamp(16px, 5vw, 64px);
+}
+
+@media (max-width: 768px) {
+  .hopping-dots-container {
+    width: min(50vh, 80vw);
+    height: min(50vh, 80vw);
+  }
 }
