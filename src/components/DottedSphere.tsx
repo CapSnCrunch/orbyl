@@ -211,6 +211,54 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     };
   }, [countdowns.length]);
 
+  // Clean up completed wave animations
+  useEffect(() => {
+    if (waveAnimations.length === 0) return;
+    
+    const cleanupInterval = setInterval(() => {
+      const now = performance.now();
+      setWaveAnimations(prev => prev.filter(anim => {
+        const elapsed = now - anim.startTime;
+        const waveRadius = elapsed * 0.002;
+        return waveRadius <= 4;
+      }));
+    }, 100); // Check every 100ms
+    
+    return () => clearInterval(cleanupInterval);
+  }, [waveAnimations.length > 0]);
+
+  // Clean up completed animating points
+  useEffect(() => {
+    if (animatingPoints.length === 0) return;
+    
+    const cleanupInterval = setInterval(() => {
+      const now = Date.now();
+      setAnimatingPoints(prev => {
+        const updated = prev.map(ap => {
+          const elapsed = now - ap.startTime;
+          if (elapsed < 0) return ap; // Not started yet
+          
+          const progress = Math.min(elapsed / 300, 1); // 300ms animation
+          const easeProgress = ap.growing 
+            ? progress * progress // ease in for growing
+            : 1 - (1 - progress) * (1 - progress); // ease out for shrinking
+          
+          return {
+            ...ap,
+            scale: ap.growing ? easeProgress : 1 - easeProgress
+          };
+        }).filter(ap => {
+          const elapsed = now - ap.startTime;
+          return elapsed < 300; // Remove completed animations
+        });
+        
+        return updated;
+      });
+    }, 16); // ~60fps
+    
+    return () => clearInterval(cleanupInterval);
+  }, [animatingPoints.length > 0]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -308,35 +356,7 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
         }
       });
 
-      // Remove completed animations
-      setWaveAnimations(prev => prev.filter(anim => {
-        const elapsed = timestamp - anim.startTime;
-        const waveRadius = elapsed * 0.002;
-        return waveRadius <= 4;
-      }));
-
-      // Update animating points
-      setAnimatingPoints(prev => {
-        const now = Date.now();
-        return prev.map(ap => {
-          const elapsed = now - ap.startTime;
-          if (elapsed < 0) return ap; // Not started yet
-          
-          const progress = Math.min(elapsed / 300, 1); // 300ms animation
-          const easeProgress = ap.growing 
-            ? progress * progress // ease in for growing
-            : 1 - (1 - progress) * (1 - progress); // ease out for shrinking
-          
-          return {
-            ...ap,
-            scale: ap.growing ? easeProgress : 1 - easeProgress
-          };
-        }).filter(ap => {
-          const elapsed = now - ap.startTime;
-          return elapsed < 300; // Remove completed animations
-        });
-      });
-
+      // Continue animation if needed
       if (waveAnimations.length > 0 || countdowns.length > 0 || cursorPos || animatingPoints.length > 0) {
         animationFrameId.current = requestAnimationFrame(render);
       }
@@ -360,8 +380,11 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     if (!canvas) return false;
     
     const rect = canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    // Scale coordinates to match canvas internal size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const sphereRadius = 180;
@@ -378,8 +401,11 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     if (!canvas) return 0;
     
     const rect = canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    // Scale coordinates to match canvas internal size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const sphereRadius = 180;
@@ -639,18 +665,29 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
     recentPositions.current = [];
   };
 
+  const getCursorStyle = () => {
+    if (isDragging) return "grabbing";
+    if (isHoveringCircle) return "grab";
+    return "default";
+  };
+
   return (
     <canvas
       ref={canvasRef}
       width={600}
       height={600}
-      className={isDragging ? "cursor-grabbing" : "cursor-grab"}
-      style={{ touchAction: 'none' }}
+      style={{ 
+        touchAction: 'none',
+        cursor: getCursorStyle()
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={(e) => {
         handleMouseMove(e);
         const canvas = canvasRef.current;
         if (!canvas) return;
+        
+        // Check if hovering over the sphere
+        setIsHoveringCircle(isInsideCircle(e.clientX, e.clientY));
         
         const rect = canvas.getBoundingClientRect();
         // Scale cursor position to match canvas internal coordinates
@@ -664,6 +701,7 @@ const DottedSphere = ({ timerMode, numPoints }: DottedSphereProps) => {
       onMouseLeave={() => {
         handleMouseUp({} as React.MouseEvent);
         setCursorPos(null);
+        setIsHoveringCircle(false);
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

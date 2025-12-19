@@ -3,10 +3,11 @@ import './App.css'
 import DottedSpherePage from './pages/DottedSpherePage'
 import WindStringsPage from './pages/WindStringsPage'
 import HoppingDotsPage from './pages/HoppingDotsPage'
+import AntMeshPage from './pages/AntMeshPage'
 import ComingSoonPage from './pages/ComingSoonPage'
 import TableOfContentsPage from './pages/TableOfContentsPage'
 import ExhibitLayout from './components/ExhibitLayout'
-import { Target, Wind, Activity, LucideIcon } from 'lucide-react'
+import { Target, Wind, Activity, Grid3x3, LucideIcon } from 'lucide-react'
 
 function App() {
   const [showWelcome, setShowWelcome] = useState(true)
@@ -21,14 +22,14 @@ function App() {
     <DottedSpherePage />,
     <WindStringsPage />,
     <HoppingDotsPage />,
-    <ComingSoonPage />
+    <AntMeshPage />
   ]
 
   const exhibitIcons: (LucideIcon | null)[] = [
     Target,
     Wind,
     Activity,
-    null // Coming Soon has no icon
+    Grid3x3
   ]
 
   const handleStart = () => {
