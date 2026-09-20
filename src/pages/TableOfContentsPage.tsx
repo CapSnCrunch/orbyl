@@ -1,4 +1,4 @@
-import { Target, Wind, Activity, Grid3x3 } from 'lucide-react';
+import { Target, Wind, Activity, Grid3x3, SlidersHorizontal, HandCoins } from 'lucide-react';
 import './TableOfContentsPage.css';
 
 interface TableOfContentsPageProps {
@@ -23,8 +23,14 @@ const TableOfContentsPage = ({ onSelectExhibit }: TableOfContentsPageProps) => {
       id: 3,
       icon: Grid3x3,
     },
-    null, // Placeholder
-    null, // Placeholder
+    {
+      id: 4,
+      icon: SlidersHorizontal,
+    },
+    {
+      id: 5,
+      icon: HandCoins,
+    },
     null, // Placeholder
     null, // Placeholder
     null, // Placeholder

@@ -1,0 +1,14 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+
+[scripts]
+setup = "npm install"
+run_mode = "concurrent"
+
+[scripts.run.dev]
+command = "npm run dev -- --port $CONDUCTOR_PORT --strictPort"
+default = true
+icon = "play"
+
+[scripts.run.preview]
+command = "npx vite build && npm run preview -- --port $CONDUCTOR_PORT --strictPort"
+icon = "globe"

@@ -4,10 +4,12 @@ import DottedSpherePage from './pages/DottedSpherePage'
 import WindStringsPage from './pages/WindStringsPage'
 import HoppingDotsPage from './pages/HoppingDotsPage'
 import AntMeshPage from './pages/AntMeshPage'
+import SliderTugPage from './pages/SliderTugPage'
+import HandCoinsPage from './pages/HandCoinsPage'
 import ComingSoonPage from './pages/ComingSoonPage'
 import TableOfContentsPage from './pages/TableOfContentsPage'
 import ExhibitLayout from './components/ExhibitLayout'
-import { Target, Wind, Activity, Grid3x3, LucideIcon } from 'lucide-react'
+import { Target, Wind, Activity, Grid3x3, SlidersHorizontal, HandCoins, LucideIcon } from 'lucide-react'
 
 function App() {
   const [showWelcome, setShowWelcome] = useState(true)
@@ -22,14 +24,18 @@ function App() {
     <DottedSpherePage />,
     <WindStringsPage />,
     <HoppingDotsPage />,
-    <AntMeshPage />
+    <AntMeshPage />,
+    <SliderTugPage />,
+    <HandCoinsPage />
   ]
 
   const exhibitIcons: (LucideIcon | null)[] = [
     Target,
     Wind,
     Activity,
-    Grid3x3
+    Grid3x3,
+    SlidersHorizontal,
+    HandCoins
   ]
 
   const handleStart = () => {
